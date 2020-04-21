@@ -161,13 +161,84 @@ class ConditionTest extends \Codeception\Test\Unit
      * @depends testBasicOneColumnOperator
      * @expectedException InvalidConditionException
      */
-    public function testIsNotWrong() {
+    public function testWrontIsNot() {
         $column1 = $this->faker->lexify('column???');
         $expression = [$column1.'[!is]'=>null];
 
-        $this->tester->expectException(Feather\Exceptions\InvalidConditionException::class,function() use ($expression) {
+        $this->tester->expectThrowable(Feather\Exceptions\InvalidConditionException::class,function() use ($expression) {
             Condition::analyze($expression);
         });
 
     }
+
+    /**
+     * @depends testBasicOneColumnOperator
+     * @expectedException InvalidConditionException
+     */
+    public function testWrongIn() {
+        $column1 = $this->faker->lexify('column???');
+        $expression = [$column1.'[in!]'=>null];
+
+        $this->tester->expectThrowable(Feather\Exceptions\InvalidConditionException::class,function() use ($expression) {
+            Condition::analyze($expression);
+        });
+    }
+
+    /**
+     * @depends testBasicOneColumnOperator
+     */
+    public function testInArray() {
+        $column1 = $this->faker->lexify('column???');
+        $value = [1,2,3];
+        $expression = [$column1.'[in]'=>$value];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasValue']);
+        $this->tester->assertEquals($data['value'],$value);
+    }
+
+    /**
+     * @depends testBasicOneColumnOperator
+     */
+    public function testInConstant() {
+        $column1 = $this->faker->lexify('column???');
+        $value = 4;
+        $expression = [$column1.'[in]'=>$value];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasValue']);
+        $this->tester->assertEquals($data['value'],[$value]);
+    }
+
+    /**
+     * @depends testBasicOneColumnOperator
+     */
+    public function testInObject() {
+        $column1 = $this->faker->lexify('column???');
+        $value = new class{ public $tester; };
+        $expression = [$column1.'[in]'=>$value];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasValue']);
+        $this->tester->assertIsObject($data['value'][0]);
+    }
+
+    /**
+     * @depends testBasicOneColumnOperator
+     */
+    public function testNotIn() {
+        $column1 = $this->faker->lexify('column???');
+        $value = [5,4,3];
+        $expression = [$column1.'[!in]'=>$value];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasValue']);
+        $this->tester->assertEquals($value,$data['value']);
+    }
+
+    
 }
