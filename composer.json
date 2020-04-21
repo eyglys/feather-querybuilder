@@ -1,0 +1,31 @@
+{
+    "name": "eyglys/php-speedy-orm",
+    "version": "0.1.0",
+    "type": "library",
+    "keywords": [
+        "orm",
+        "query builder"
+    ],
+    "authors": [
+        {
+            "name": "Keylly Eyglys",
+            "email": "eyglys@gmail.com",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Feather\\": "src/"
+        }
+    },
+    "require-dev": {
+        "codeception/codeception": "^4.1",
+        "codeception/module-phpbrowser": "^1.0.0",
+        "codeception/module-asserts": "^1.1",
+        "monolog/monolog": "^2.0"
+    }
+}
