@@ -240,5 +240,49 @@ class ConditionTest extends \Codeception\Test\Unit
         $this->tester->assertEquals($value,$data['value']);
     }
 
+    /**
+     * @depends testBasicOneColumnOperator
+     */
+    public function testSimpleBeetween() {
+        $column1 = $this->faker->lexify('column???');
+        $value = [5,10];
+        $expression = [$column1.'[btw]'=>$value];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasValue']);
+        $this->tester->assertEquals($value,$data['value']);
+    }
+    /**
+     * @depends testBasicOneColumnOperator
+     */
+    public function testSimpleNotBeetween() {
+        $column1 = $this->faker->lexify('column???');
+        $value = [5,10];
+        $expression = [$column1.'[!btw]'=>$value];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasValue']);
+        $this->tester->assertEquals($value,$data['value']);
+    }
+
+    /**
+     * @depends testBasicTwoColumnsOperator
+     */
+    public function testSimpleBeetweenTwoColumns() {
+        $column1 = $this->faker->lexify('column???');
+        $column2 = $this->faker->lexify('column???');
+        $column3 = $this->faker->lexify('column???');
+        $expression = $column1.'[btw]'.$column2.'[and]'.$column3;
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertFalse($data['hasValue']);
+        $this->tester->assertEquals(3,$data['columnsCount']);
+        $this->tester->assertEquals([$column1,$column2,$column3],$data['columns']);
+    }
+
+
     
 }

@@ -17,6 +17,7 @@ class Condition extends \Feather\Base {
     const OP_LEFT_LIKE = '%LIKE';
     const OP_RIGHT_LIKE = 'LIKE%';
     const OP_BETWEEN = 'BTW';
+    const OP_NOT_BETWEEN = '!BTW';
     const OP_IN = 'IN';
     const OP_NOT_IN = '!IN';
     const OP_IS = 'IS';
@@ -39,6 +40,7 @@ class Condition extends \Feather\Base {
         self::OP_LEFT_LIKE,
         self::OP_RIGHT_LIKE,
         self::OP_BETWEEN,
+        self::OP_NOT_BETWEEN,
         self::OP_IN,
         self::OP_NOT_IN,
         self::OP_IS,
@@ -65,8 +67,9 @@ class Condition extends \Feather\Base {
      * Regular expressions
      */
 
-    //public static $patternOneColumn = '/^([^\[\]\ ]+)[ ]*\[([^\]]+)\][ ]*$/is';
-    public static $patternExpression = '/^([^\[\]\ ]+)[ ]*\[([^\]]+)\][ ]*([^\[\]\ ]*)$/is';
+    public static $patternExpression = '/^([^\[\]\ ]+)[ ]*\[([^\]]+)\][ ]*(.*)$/is';
+
+    public static $patternBeetweenOperands = '/^([^\[\]\ ]+)[ ]*\[and\][ ]*(.*)$/is';
 
     /**
      * Analyze a single expression
@@ -88,12 +91,35 @@ class Condition extends \Feather\Base {
                 if (!empty($matches[3])) {
                     $result['columns'][] = $matches[3];
                     $result['columnsCount']++;
+
+                    //analyse specific cases
+                    return self::reanalyzeExpression($result);
                 }
                 return $result;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Reanalyze columns considering existence of two or more columns
+     * @param array $analyzeData result data of analyzeExpression
+     * @return array processed data
+     */
+    public static function reanalyzeExpression(array $analyzeData) {
+        switch ($analyzeData['operator']) {
+            case self::OP_BETWEEN:
+            case self::OP_NOT_BETWEEN:
+                //$analyzeData[1] = second param, testing if in format column2[and]column2
+                if (preg_match(self::$patternBeetweenOperands,$analyzeData['columns'][1],$matches)) {
+                    $analyzeData['columns'] = [$analyzeData['columns'][0],$matches[1],$matches[2]];
+                    $analyzeData['columnsCount'] = 3;
+                } 
+            break;
+        }
+
+        return $analyzeData;
     }
 
     /**
@@ -119,6 +145,7 @@ class Condition extends \Feather\Base {
 
     /**
      * Transform value according to the operation
+     * @throws Feather\Exceptions\InvalidValueException when value is invalid
      */
     public static function valueTransform(string $operation,$value) {
         switch ($operation) {
@@ -134,6 +161,11 @@ class Condition extends \Feather\Base {
                 if (!is_array($value) && !is_object($value)) $value = [$value];
                 break;
 
+            case self::OP_BETWEEN:
+            case self::OP_NOT_BETWEEN:
+                if (!is_array($value) || (count($value) != 2)) throw new InvalidValueException('BETWEEN operator need array with 2 items');
+            break;
+
             default:
                 return $value;
                 break;
@@ -146,12 +178,15 @@ class Condition extends \Feather\Base {
      * @param string|array $condition Condition to analise
      * @return array analyze array of conditions
      * @throws Feather\Exceptions\InvalidConditionException
+     * @throws Feather\Exceptions\InvalidValueException
      */
     public static function analyze($condition):?array {
         //single comparison between columns
         if (is_string($condition)) {
             $result = self::analyzeExpression($condition);
-            if (!is_null($result)) return $result;
+            if (!is_null($result)) {
+                return $result;
+            }
             else throw new InvalidConditionException($condition);
         } elseif (is_array($condition)) {
             $keys = array_keys($condition);
