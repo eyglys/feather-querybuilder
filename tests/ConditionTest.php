@@ -1,7 +1,7 @@
 <?php 
 use Feather\Query\Condition;
 use Faker\Factory;
-class RegExpTest extends \Codeception\Test\Unit
+class ConditionTest extends \Codeception\Test\Unit
 {
     /**
      * @var \UnitTester
