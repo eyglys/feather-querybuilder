@@ -18,6 +18,8 @@ class Condition extends \Feather\Base {
     const OP_RIGHT_LIKE = 'LIKE%';
     const OP_BETWEEN = 'BTW';
     const OP_IN = 'IN';
+    const OP_IS = 'IS';
+    const OP_IS_NOT = 'IS!';
 
     //Relational operators
 
@@ -37,6 +39,8 @@ class Condition extends \Feather\Base {
         self::OP_RIGHT_LIKE,
         self::OP_BETWEEN,
         self::OP_IN,
+        self::OP_IS,
+        self::OP_IS_NOT,
 
         self::OP_GREATER,
         self::OP_GREATER_OR_EQUAL,
@@ -74,15 +78,17 @@ class Condition extends \Feather\Base {
             $result = [
                 'columns'=>[trim($matches[1])],
                 'columnsCount' =>1,
-                'operator'=>trim($matches[2]),
+                'operator'=>mb_strtoupper(trim($matches[2])),
                 'hasValue'=>false
             ];
-            $matches[3] = trim($matches[3]);
-            if (!empty($matches[3])) {
-                $result['columns'][] = $matches[3];
-                $result['columnsCount']++;
+            if (in_array($result['operator'],self::$relationalOperators)) {
+                $matches[3] = trim($matches[3]);
+                if (!empty($matches[3])) {
+                    $result['columns'][] = $matches[3];
+                    $result['columnsCount']++;
+                }
+                return $result;
             }
-            return $result;
         }
 
         return null;
@@ -98,9 +104,9 @@ class Condition extends \Feather\Base {
         $value = (string) $value;
         if (($operation[0] != '%') && ($operation[-1] != '%')) {
             return 
-                ['%'.
+                '%'.
                 mb_ereg_replace('[ ]+','%',trim($value))
-                .'%'];
+                .'%';
         } else {
             if ($operation[0] == '%') $value = '%'.$value;
             if ($operation[-1] == '%') $value = $value.'%';
@@ -113,13 +119,16 @@ class Condition extends \Feather\Base {
      * Transform value according to the operation
      */
     public static function valueTransform(string $operation,$value) {
-        $operation = mb_strtoupper($operation);
         switch ($operation) {
             case self::OP_FULL_LIKE:
             case self::OP_BOTH_LIKE:
             case self::OP_LEFT_LIKE:
             case self::OP_RIGHT_LIKE:
                 return self::likeTransform($operation,$value);
+            break;
+
+            default:
+                return $value;
             break;
         }
         return $value;
@@ -136,22 +145,22 @@ class Condition extends \Feather\Base {
         if (is_string($condition)) {
             $result = self::analyzeExpression($condition);
             if (!is_null($result)) return $result;
-            else throw new InvalidConditionException('Invalid condition '.$condition);
+            else throw new InvalidConditionException($condition);
         } elseif (is_array($condition)) {
             $keys = array_keys($condition);
             $values = array_values($condition);
-            //$keyTypes = array_map(($key)=>gettype($key),$keys);
             $result = [];
+
             foreach ($condition as $key => $value) {
                 if (is_string($key)) {
                     $data = self::analyzeExpression($key);
-                    $data['value'] = self::valueTransform($data['operator'],$value);
-                    $data['hasValue'] = true;
+                    if (!is_null($data)) {
+                        $data['value'] = self::valueTransform($data['operator'],$value);
+                        if (!is_array($data['value'])) $data['value'] = [$data['value']];
+                        $data['hasValue'] = true;
 
-                    //if (is_array($value)) $data['values'] = $value;
-                    //else $data['values'] = [$value];
-
-                    $result[] = $data;
+                        $result[] = $data;
+                    } else throw new InvalidConditionException($key);
                 } elseif (is_int($key)) {
                     $result[] = self::analyze($value);
                 }
@@ -161,7 +170,7 @@ class Condition extends \Feather\Base {
             else return $result;
         }
 
-        throw new InvalidConditionException();
+        throw new InvalidConditionException($condition);
     }
 
 }
