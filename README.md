@@ -56,6 +56,7 @@ ORM PHP library
 | Syntax | Result |
 |---|------ |
 | ``['column[in]'=>[1,2,3]]`` |  ``(column IN (1,2,3))`` |
+| ``['column[!in]'=>[1,2,3]]`` |  ``(column NOT IN (1,2,3))`` |
 | ``['column[in]'=>$queryObject]`` |  ``(column IN (SELECT ...))`` |
 
   

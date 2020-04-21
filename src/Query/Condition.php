@@ -18,6 +18,7 @@ class Condition extends \Feather\Base {
     const OP_RIGHT_LIKE = 'LIKE%';
     const OP_BETWEEN = 'BTW';
     const OP_IN = 'IN';
+    const OP_NOT_IN = '!IN';
     const OP_IS = 'IS';
     const OP_IS_NOT = 'IS!';
 
@@ -39,6 +40,7 @@ class Condition extends \Feather\Base {
         self::OP_RIGHT_LIKE,
         self::OP_BETWEEN,
         self::OP_IN,
+        self::OP_NOT_IN,
         self::OP_IS,
         self::OP_IS_NOT,
 
@@ -125,11 +127,16 @@ class Condition extends \Feather\Base {
             case self::OP_LEFT_LIKE:
             case self::OP_RIGHT_LIKE:
                 return self::likeTransform($operation,$value);
-            break;
+                break;
+
+            case self::OP_NOT_IN:
+            case self::OP_IN:
+                if (!is_array($value) && !is_object($value)) $value = [$value];
+                break;
 
             default:
                 return $value;
-            break;
+                break;
         }
         return $value;
     }
