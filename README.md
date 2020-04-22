@@ -25,7 +25,7 @@ ORM PHP library
 |---|------ |
 | ``['column[=]'=>$value]`` | ``(column = :value)`` |
 | ``['column[>]'=>$value]`` | ``(column > :value)`` |
-| ``['column[<]'=>$value]`` | ``(column <> :value)`` |
+| ``['column[<]'=>$value]`` | ``(column < :value)`` |
 | ``['column[>=]'=>$value]`` | ``(column >= :value)`` |
 | ``['column[<=]'=>$value]`` | ``(column <= :value)`` |
 | ``['column[!=]'=>$value]`` | ``(column != :value)`` |
