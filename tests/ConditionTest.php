@@ -31,8 +31,8 @@ class ConditionTest extends \Codeception\Test\Unit
 
             $data = Condition::analyze($expression);
 
-            $this->tester->assertTrue($data['columnsCount'] == 1);
-            $this->tester->assertTrue($data['columns'][0] == $column);
+            $this->tester->assertTrue($data['operandsCount'] == 1);
+            $this->tester->assertTrue($data['operands'][0] == $column);
             $this->tester->assertTrue($data['operator'] == $operator);
         }
     }
@@ -49,9 +49,9 @@ class ConditionTest extends \Codeception\Test\Unit
 
             $data = Condition::analyze($expression);
 
-            $this->tester->assertTrue($data['columnsCount'] == 2);
-            $this->tester->assertTrue($data['columns'][0] == $column1);
-            $this->tester->assertTrue($data['columns'][1] == $column2);
+            $this->tester->assertTrue($data['operandsCount'] == 2);
+            $this->tester->assertTrue($data['operands'][0] == $column1);
+            $this->tester->assertTrue($data['operands'][1] == $column2);
             $this->tester->assertTrue($data['operator'] == $operator);
         }
     }
@@ -61,22 +61,22 @@ class ConditionTest extends \Codeception\Test\Unit
      */
     public function testFullLike() {
         $column1 = $this->faker->lexify('column???');
-        $expression = [$column1.'[like]'=>'teste1 teste2'];
+        $expression = [$column1.'[like]'=>'test1 test2'];
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('%teste1%teste2%',$data['value'][0]);
+        $this->tester->assertEquals('%test1%test2%',$data['value'][0]);
     }
     /**
      * @depends testBasicOneColumnOperator
      */
     public function testBothLike() {
         $column1 = $this->faker->lexify('column???');
-        $expression = [$column1.'[%like%]'=>'teste'];
+        $expression = [$column1.'[%like%]'=>'test'];
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('%teste%',$data['value'][0]);
+        $this->tester->assertEquals('%test%',$data['value'][0]);
     }
 
     /**
@@ -84,11 +84,11 @@ class ConditionTest extends \Codeception\Test\Unit
      */
     public function testLeftLike() {
         $column1 = $this->faker->lexify('column???');
-        $expression = [$column1.'[%like]'=>'teste'];
+        $expression = [$column1.'[%like]'=>'test'];
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('%teste',$data['value'][0]);
+        $this->tester->assertEquals('%test',$data['value'][0]);
     }
 
     /**
@@ -96,11 +96,11 @@ class ConditionTest extends \Codeception\Test\Unit
      */
     public function testRightLike() {
         $column1 = $this->faker->lexify('column???');
-        $expression = [$column1.'[like%]'=>'teste'];
+        $expression = [$column1.'[like%]'=>'test'];
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('teste%',$data['value'][0]);
+        $this->tester->assertEquals('test%',$data['value'][0]);
     }
 
     /**
@@ -279,10 +279,101 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertFalse($data['hasValue']);
-        $this->tester->assertEquals(3,$data['columnsCount']);
-        $this->tester->assertEquals([$column1,$column2,$column3],$data['columns']);
+        $this->tester->assertEquals(3,$data['operandsCount']);
+        $this->tester->assertEquals([$column1,$column2,$column3],$data['operands']);
     }
 
+    /**
+     * @depends testBasicOneColumnOperator
+     * @depends testSimpleBeetween
+     */
+    public function testLogicalOperators() {
+        $column1 = $this->faker->lexify('column???');
+        $column2 = $this->faker->lexify('column???');
+        $column3 = $this->faker->lexify('column???');
+        $value1 = rand(1,10);
 
-    
+        $operators = array_filter(Condition::$logicalOperators,fn($op) => $op != Condition::OP_NOT);
+        foreach ($operators as $operator) {
+            $expression = [
+                mb_strtolower($operator) => [
+                    //as array
+                    [$column1.'[>]'=>$value1],
+                    //as string
+                    $column1.'[btw]'.$column2.'[and]'.$column3
+                ]
+            ];
+
+            $data = Condition::analyze($expression);
+
+            $this->tester->assertTrue($data['hasChilds']);
+            $this->tester->assertEquals(2,$data['operandsCount']);
+
+            //operand 1
+            $this->tester->assertTrue($data['operands'][0]['hasValue']);
+            $this->tester->assertEquals($value1,$data['operands'][0]['value'][0]);
+            $this->tester->assertEquals(Condition::OP_GREATER,$data['operands'][0]['operator']);
+            
+            //operand 2
+            $this->tester->assertFalse($data['operands'][1]['hasValue']);
+            $this->tester->assertEquals(Condition::OP_BETWEEN,$data['operands'][1]['operator']);
+            $this->tester->assertEquals([$column1,$column2,$column3],$data['operands'][1]['operands']);
+        }
+    }
+
+    /**
+     * @depends testLogicalOperators
+     */
+    public function testLogicalOperatorNot() {
+        $column1 = $this->faker->lexify('column???');
+        $column2 = $this->faker->lexify('column???');
+        $column3 = $this->faker->lexify('column???');
+        $value1 = rand(1,10);
+
+        $expression = [
+            mb_strtolower(Condition::OP_NOT) => [
+                //as array
+                [$column1.'[>]'=>$value1],
+                //as string
+                $column1.'[btw]'.$column2.'[and]'.$column3
+            ]
+        ];
+
+        $this->tester->expectThrowable(Feather\Exceptions\InvalidConditionException::class,function() use ($expression) {
+            Condition::analyze($expression);
+        });
+
+        $expression = [
+            mb_strtolower(Condition::OP_NOT) => [
+                //as array
+                [$column1.'[>]'=>$value1],
+            ]
+        ];
+
+        $data = Condition::analyze($expression);
+
+        $this->tester->assertTrue($data['hasChilds']);
+        $this->tester->assertEquals(1,$data['operandsCount']);
+        $this->tester->assertTrue($data['operands'][0]['hasValue']);
+        $this->tester->assertEquals($value1,$data['operands'][0]['value'][0]);
+        $this->tester->assertEquals(Condition::OP_GREATER,$data['operands'][0]['operator']);
+        $this->tester->assertEquals([$column1],$data['operands'][0]['operands']);
+    }
+
+    /**
+     * @depends testLogicalOperators
+     */
+    public function testInvalidLogicalOperators() {
+
+        foreach (Condition::$logicalOperators as $operator) {
+            $expression = [
+                mb_strtolower($operator)
+            ];
+
+            $this->tester->expectThrowable(Feather\Exceptions\InvalidConditionException::class,function() use ($expression) {
+                Condition::analyze($expression);
+            });
+        }
+    }
+
 }
