@@ -1,6 +1,8 @@
 # php-feather-orm
 PHP library thats implements a lightweight ORM
 
+[![Continuous Integration](https://github.com/eyglys/php-feather-orm/workflows/UnitTest/badge.svg?branch=master)](https://github.com/eyglys/php-feather-orm/actions)
+
   
 
 ## Condition syntax
