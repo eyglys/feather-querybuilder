@@ -1,7 +1,9 @@
 {
-    "name": "eyglys/php-speedy-orm",
+    "name": "eyglys/php-feather-orm",
+    "description": "PHP library thats implements a lightweight ORM",
     "version": "0.1.0",
     "type": "library",
+    "license": "GPL-3.0-or-later",
     "keywords": [
         "orm",
         "query builder"
