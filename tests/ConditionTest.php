@@ -2,6 +2,9 @@
 use Feather\Query\Condition;
 use Faker\Factory;
 use Feather\Exceptions\InvalidConditionException;
+
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 class ConditionTest extends \Codeception\Test\Unit
 {
     /**
@@ -11,10 +14,14 @@ class ConditionTest extends \Codeception\Test\Unit
 
     protected $faker;
 
+    protected $log;
+
     
     protected function _before()
     {
         $this->faker = Factory::create();
+        $this->log = new Logger('test');
+        $this->log->pushHandler(new StreamHandler(__DIR__.'/../runtime/debug_info.log', Logger::INFO));
     }
 
     protected function _after()
@@ -374,6 +381,53 @@ class ConditionTest extends \Codeception\Test\Unit
                 Condition::analyze($expression);
             });
         }
+    }
+
+    /**
+     * @depends testLogicalOperators
+     */
+    public function testComplexLogicalOperator() {
+        $column1 = $this->faker->lexify('column???');
+        $column2 = $this->faker->lexify('column???');
+        $column3 = $this->faker->lexify('column???');
+        $value1 = rand(1,10);
+        $value2 = 'my name';
+        $value3 = rand(1,10);
+
+
+        $firstOperator = Condition::OP_OR;
+        $secondOperator = Condition::OP_AND;
+        
+
+        $expression = [
+            $firstOperator => [
+                ['vip[is]'=>true],
+                $secondOperator=>[
+                    [$column1.'[!=]'=>$value1],
+                    [$column2.'[like]'=>$value2],
+                ]
+            ]
+        ];
+
+        $data = Condition::analyze($expression);
+
+
+        $this->tester->assertTrue($data['hasChilds']);
+        $this->tester->assertEquals(2,$data['operandsCount']);
+        $this->tester->assertEquals($firstOperator,$data['operator']);
+        $this->tester->assertEquals(1,$data['operands'][0]['operandsCount']);
+        $this->tester->assertTrue($data['operands'][0]['hasValue']);
+        $this->tester->assertEquals(Condition::OP_IS,$data['operands'][0]['operator']);
+        $this->tester->assertEquals(true,$data['operands'][0]['value'][0]);
+        $this->tester->assertFalse($data['operands'][0]['hasChilds']);
+
+        $this->tester->assertEquals($secondOperator,$data['operands'][1]['operator']);
+        $this->tester->assertEquals(2,$data['operands'][1]['operandsCount']);
+        $this->tester->assertTrue($data['operands'][1]['operands'][0]['hasValue']);
+        $this->tester->assertTrue($data['operands'][1]['operands'][1]['hasValue']);
+        $this->tester->assertEquals($value1,$data['operands'][1]['operands'][0]['value'][0]);
+        $this->tester->assertEquals('%my%name%',$data['operands'][1]['operands'][1]['value'][0]);
+        
     }
 
 }

@@ -84,9 +84,9 @@ class Condition extends \Feather\Base {
         if (preg_match(self::$patternExpression,$expression,$matches)) {
 
             $result = [
+                'operator'=>mb_strtoupper(trim($matches[2])),
                 'operands'=>[trim($matches[1])],
                 'operandsCount' =>1,
-                'operator'=>mb_strtoupper(trim($matches[2])),
                 'hasValue'=>false,
                 'hasChilds'=>false,
             ];
@@ -104,9 +104,9 @@ class Condition extends \Feather\Base {
         } else {
             if (preg_match(self::$patternLogicalOperators,$expression,$matches)) {
                 return [
+                    'operator'=>mb_strtoupper(trim($matches[1])),
                     'operands'=>[],
                     'operandsCount' =>0,
-                    'operator'=>mb_strtoupper(trim($matches[1])),
                     'hasValue'=>false,
                     'hasChilds'=>true,
                 ];
@@ -203,11 +203,10 @@ class Condition extends \Feather\Base {
             }
             else throw new InvalidConditionException($condition);
         } elseif (is_array($condition)) {
-            $keys = array_keys($condition);
-            $values = array_values($condition);
-            $result = [];
-
-            foreach ($condition as $key => $value) {
+            $count = count($condition);
+            if ($count == 1) {
+                $key = array_key_first($condition);
+                $value = $condition[$key];
                 if (is_string($key)) {
 
                     $data = self::analyze($key);
@@ -231,7 +230,10 @@ class Condition extends \Feather\Base {
                             } elseif (count($value) != 1) throw new InvalidConditionException('Logical operator \''.$data['operator'].'\' needs exactly 1 operand');
                         }
 
-                        foreach ($value as $internalCondition) {
+                        foreach ($value as $internalKey =>$internalCondition) {
+                            
+                            if (is_string($internalKey)) $internalCondition = [$internalKey =>$internalCondition];
+
                             $data['operands'][] = self::analyze($internalCondition);
                             $data['operandsCount']++;
                         }
@@ -247,6 +249,10 @@ class Condition extends \Feather\Base {
                     if ($tmpResult['hasChilds']) throw new InvalidConditionException('Logical operator \''.$tmpResult['operator'].'\' needs operand(s)');
                     else $result[] = $tmpResult;
                 }
+            } else {
+                return self::analyze([
+                    self::OP_AND=> $condition
+                ]);
             }
 
             if (count($result) == 1) return $result[0];
