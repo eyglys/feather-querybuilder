@@ -12,6 +12,7 @@ class Condition extends \Feather\Base {
     const OP_AND = 'AND';
     const OP_OR = 'OR';
     const OP_NOT = 'NOT';
+    const OP_XOR = 'XOR';
     const OP_FULL_LIKE = 'LIKE';
     const OP_BOTH_LIKE = '%LIKE%';
     const OP_LEFT_LIKE = '%LIKE';
@@ -60,7 +61,7 @@ class Condition extends \Feather\Base {
         self::OP_AND,
         self::OP_OR,
         self::OP_NOT,
-        
+        self::OP_XOR,
     ];
 
     /**
