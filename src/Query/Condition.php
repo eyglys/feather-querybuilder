@@ -72,6 +72,8 @@ class Condition extends \Feather\Base {
 
     public static $patternBeetweenOperands = '/^([^\[\]\ ]+)[ ]*\[and\][ ]*(.*)$/is';
 
+    protected static $patternLogicalOperators = '/^('.self::OP_AND.'|'.self::OP_OR.'|'.self::OP_NOT.'|'.self::OP_XOR.')$/is';
+
     /**
      * Analyze a single expression
      * @param string $expression
@@ -82,21 +84,32 @@ class Condition extends \Feather\Base {
         if (preg_match(self::$patternExpression,$expression,$matches)) {
 
             $result = [
-                'columns'=>[trim($matches[1])],
-                'columnsCount' =>1,
+                'operands'=>[trim($matches[1])],
+                'operandsCount' =>1,
                 'operator'=>mb_strtoupper(trim($matches[2])),
-                'hasValue'=>false
+                'hasValue'=>false,
+                'hasChilds'=>false,
             ];
             if (in_array($result['operator'],self::$relationalOperators)) {
                 $matches[3] = trim($matches[3]);
                 if (!empty($matches[3])) {
-                    $result['columns'][] = $matches[3];
-                    $result['columnsCount']++;
+                    $result['operands'][] = $matches[3];
+                    $result['operandsCount']++;
 
                     //analyse specific cases
                     return self::reanalyzeExpression($result);
                 }
                 return $result;
+            }
+        } else {
+            if (preg_match(self::$patternLogicalOperators,$expression,$matches)) {
+                return [
+                    'operands'=>[],
+                    'operandsCount' =>0,
+                    'operator'=>mb_strtoupper(trim($matches[1])),
+                    'hasValue'=>false,
+                    'hasChilds'=>true,
+                ];
             }
         }
 
@@ -113,9 +126,9 @@ class Condition extends \Feather\Base {
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
                 //$analyzeData[1] = second param, testing if in format column2[and]column2
-                if (preg_match(self::$patternBeetweenOperands,$analyzeData['columns'][1],$matches)) {
-                    $analyzeData['columns'] = [$analyzeData['columns'][0],$matches[1],$matches[2]];
-                    $analyzeData['columnsCount'] = 3;
+                if (preg_match(self::$patternBeetweenOperands,$analyzeData['operands'][1],$matches)) {
+                    $analyzeData['operands'] = [$analyzeData['operands'][0],$matches[1],$matches[2]];
+                    $analyzeData['operandsCount'] = 3;
                 } 
             break;
         }
@@ -196,16 +209,43 @@ class Condition extends \Feather\Base {
 
             foreach ($condition as $key => $value) {
                 if (is_string($key)) {
-                    $data = self::analyzeExpression($key);
-                    if (!is_null($data)) {
+
+                    $data = self::analyze($key);
+                    //logical operator (and|or|not|xor)
+                    if ($data['hasChilds']) {
+                        
+                        if ($data['operator'] != self::OP_NOT) {
+                            /**
+                             * ['and'=>[
+                             *      ['column1[>]'=>$value],
+                             *      ['column2[<=]'=>$value2]
+                             *  ]
+                             * ]
+                             */
+                            if (!is_array($value) || (($operandsCount = count($value)) < 2)) {
+                                throw new InvalidConditionException('Logical operator \''.$data['operator'].'\' needs at least 2 operands');
+                            }
+                        } else {
+                            if (!is_array($value)) {
+                                $value = [$value];
+                            } elseif (count($value) != 1) throw new InvalidConditionException('Logical operator \''.$data['operator'].'\' needs exactly 1 operand');
+                        }
+
+                        foreach ($value as $internalCondition) {
+                            $data['operands'][] = self::analyze($internalCondition);
+                            $data['operandsCount']++;
+                        }
+                    } else {
                         $data['value'] = self::valueTransform($data['operator'],$value);
                         if (!is_array($data['value'])) $data['value'] = [$data['value']];
                         $data['hasValue'] = true;
+                    }
 
-                        $result[] = $data;
-                    } else throw new InvalidConditionException($key);
+                    $result[] = $data;
                 } elseif (is_int($key)) {
-                    $result[] = self::analyze($value);
+                    $tmpResult = self::analyze($value);
+                    if ($tmpResult['hasChilds']) throw new InvalidConditionException('Logical operator \''.$tmpResult['operator'].'\' needs operand(s)');
+                    else $result[] = $tmpResult;
                 }
             }
 
