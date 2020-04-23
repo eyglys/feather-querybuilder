@@ -78,7 +78,7 @@ class Condition extends \Feather\Base {
      * @return array null if is invalid, array with column(s), by writing order, and operator
      * 
      */
-    public static function analyzeExpression(string $expression):?array {
+    protected static function analyzeExpression(string $expression):?array {
         if (preg_match(self::$patternExpression,$expression,$matches)) {
 
             $result = [
@@ -108,7 +108,7 @@ class Condition extends \Feather\Base {
      * @param array $analyzeData result data of analyzeExpression
      * @return array processed data
      */
-    public static function reanalyzeExpression(array $analyzeData) {
+    protected static function reanalyzeExpression(array $analyzeData) {
         switch ($analyzeData['operator']) {
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
@@ -129,7 +129,7 @@ class Condition extends \Feather\Base {
      * @param string $value value of like
      * @return string transformed value
      */
-    public static function likeTransform($operation,$value) {
+    protected static function likeTransform($operation,$value) {
         $value = (string) $value;
         if (($operation[0] != '%') && ($operation[-1] != '%')) {
             return 
@@ -148,7 +148,7 @@ class Condition extends \Feather\Base {
      * Transform value according to the operation
      * @throws Feather\Exceptions\InvalidValueException when value is invalid
      */
-    public static function valueTransform(string $operation,$value) {
+    protected static function valueTransform(string $operation,$value) {
         switch ($operation) {
             case self::OP_FULL_LIKE:
             case self::OP_BOTH_LIKE:
