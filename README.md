@@ -1,7 +1,6 @@
-# php-feather-orm
-PHP library thats implements a lightweight ORM
+# Feather - A Lightweight PHP QueryBuilder lib
 
-[![Continuous Integration](https://github.com/eyglys/php-feather-orm/workflows/UnitTest/badge.svg?branch=master)](https://github.com/eyglys/php-feather-orm/actions)
+[![UnitTest](https://github.com/eyglys/feather-querybuilder/workflows/UnitTest/badge.svg)]((https://github.com/eyglys/feather-querybuilder/actions))
 
   
 
