@@ -28,5 +28,8 @@
         "codeception/module-asserts": "^1.1",
         "monolog/monolog": "^2.0",
         "fzaninotto/faker": "^1.9"
+    },
+    "scripts": {
+        "test": "codecept run unit"
     }
 }
