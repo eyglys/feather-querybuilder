@@ -1,5 +1,5 @@
 # php-feather-orm
-ORM PHP library
+PHP library thats implements a lightweight ORM
 
   
 
