@@ -20,7 +20,7 @@ class ConditionTest extends \Codeception\Test\Unit
     protected function _before()
     {
         $this->faker = Factory::create();
-        $this->log = new Logger('test');
+        $this->log = new Logger('Condition');
         $this->log->pushHandler(new StreamHandler(__DIR__.'/../runtime/debug_info.log', Logger::INFO));
     }
 
@@ -182,7 +182,7 @@ class ConditionTest extends \Codeception\Test\Unit
      * @depends testBasicOneColumnOperator
      * @expectedException InvalidConditionException
      */
-    public function testWrongIn() {
+    public function testWrongNotIn() {
         $column1 = $this->faker->lexify('column???');
         $expression = [$column1.'[in!]'=>null];
 
@@ -202,7 +202,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($data['value'],$value);
+        $this->tester->assertEquals($value,$data['value'][0]);
     }
 
     /**
@@ -216,7 +216,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($data['value'],[$value]);
+        $this->tester->assertEquals($value,$data['value'][0]);
     }
 
     /**
@@ -244,7 +244,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($value,$data['value']);
+        $this->tester->assertEquals($value,$data['value'][0]);
     }
 
     /**

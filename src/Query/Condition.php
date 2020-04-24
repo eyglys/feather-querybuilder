@@ -158,21 +158,24 @@ class Condition extends \Feather\Base {
     }
 
     /**
-     * Transform value according to the operation
+     * Transform value according to the operator
+     * @param string $operator
+     * @param mixed $value
      * @throws Feather\Exceptions\InvalidValueException when value is invalid
      */
-    protected static function valueTransform(string $operation,$value) {
-        switch ($operation) {
+    protected static function valueTransform(string $operator,$value) {
+        switch ($operator) {
             case self::OP_FULL_LIKE:
             case self::OP_BOTH_LIKE:
             case self::OP_LEFT_LIKE:
             case self::OP_RIGHT_LIKE:
-                return self::likeTransform($operation,$value);
+                return self::likeTransform($operator,$value);
                 break;
 
             case self::OP_NOT_IN:
             case self::OP_IN:
-                if (!is_array($value) && !is_object($value)) $value = [$value];
+                //if (!is_array($value) && !is_object($value))
+                return [0=>$value];
                 break;
 
             case self::OP_BETWEEN:
