@@ -154,7 +154,7 @@ class Condition extends \Feather\Base {
             if ($operation[-1] == '%') $value = $value.'%';
         }
 
-        return [$value];
+        return $value;
     }
 
     /**
@@ -170,13 +170,7 @@ class Condition extends \Feather\Base {
             case self::OP_LEFT_LIKE:
             case self::OP_RIGHT_LIKE:
                 return self::likeTransform($operator,$value);
-                break;
-
-            case self::OP_NOT_IN:
-            case self::OP_IN:
-                //if (!is_array($value) && !is_object($value))
-                return [0=>$value];
-                break;
+            break;
 
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
@@ -185,7 +179,7 @@ class Condition extends \Feather\Base {
 
             default:
                 return $value;
-                break;
+            break;
         }
         return $value;
     }
@@ -242,7 +236,6 @@ class Condition extends \Feather\Base {
                         }
                     } else {
                         $data['value'] = self::valueTransform($data['operator'],$value);
-                        if (!is_array($data['value'])) $data['value'] = [$data['value']];
                         $data['hasValue'] = true;
                     }
 

@@ -72,7 +72,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('%test1%test2%',$data['value'][0]);
+        $this->tester->assertEquals('%test1%test2%',$data['value']);
     }
     /**
      * @depends testBasicOneColumnOperator
@@ -83,7 +83,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('%test%',$data['value'][0]);
+        $this->tester->assertEquals('%test%',$data['value']);
     }
 
     /**
@@ -95,7 +95,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('%test',$data['value'][0]);
+        $this->tester->assertEquals('%test',$data['value']);
     }
 
     /**
@@ -107,7 +107,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
         $data = Condition::analyze($expression);
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals('test%',$data['value'][0]);
+        $this->tester->assertEquals('test%',$data['value']);
     }
 
     /**
@@ -120,7 +120,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertNull($data['value'][0]);
+        $this->tester->assertNull($data['value']);
     }
 
     /**
@@ -134,7 +134,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($constant,$data['value'][0]);
+        $this->tester->assertEquals($constant,$data['value']);
     }
 
     /**
@@ -148,7 +148,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($constant,$data['value'][0]);
+        $this->tester->assertEquals($constant,$data['value']);
     }
 
     /**
@@ -161,7 +161,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertNull($data['value'][0]);
+        $this->tester->assertNull($data['value']);
     }
 
     /**
@@ -202,7 +202,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($value,$data['value'][0]);
+        $this->tester->assertEquals($value,$data['value']);
     }
 
     /**
@@ -216,7 +216,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($value,$data['value'][0]);
+        $this->tester->assertEquals($value,$data['value']);
     }
 
     /**
@@ -230,7 +230,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertIsObject($data['value'][0]);
+        $this->tester->assertIsObject($data['value']);
     }
 
     /**
@@ -244,7 +244,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $data = Condition::analyze($expression);
 
         $this->tester->assertTrue($data['hasValue']);
-        $this->tester->assertEquals($value,$data['value'][0]);
+        $this->tester->assertEquals($value,$data['value']);
     }
 
     /**
@@ -318,7 +318,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
             //operand 1
             $this->tester->assertTrue($data['operands'][0]['hasValue']);
-            $this->tester->assertEquals($value1,$data['operands'][0]['value'][0]);
+            $this->tester->assertEquals($value1,$data['operands'][0]['value']);
             $this->tester->assertEquals(Condition::OP_GREATER,$data['operands'][0]['operator']);
             
             //operand 2
@@ -362,7 +362,7 @@ class ConditionTest extends \Codeception\Test\Unit
         $this->tester->assertTrue($data['hasChilds']);
         $this->tester->assertEquals(1,$data['operandsCount']);
         $this->tester->assertTrue($data['operands'][0]['hasValue']);
-        $this->tester->assertEquals($value1,$data['operands'][0]['value'][0]);
+        $this->tester->assertEquals($value1,$data['operands'][0]['value']);
         $this->tester->assertEquals(Condition::OP_GREATER,$data['operands'][0]['operator']);
         $this->tester->assertEquals([$column1],$data['operands'][0]['operands']);
     }
@@ -418,15 +418,15 @@ class ConditionTest extends \Codeception\Test\Unit
         $this->tester->assertEquals(1,$data['operands'][0]['operandsCount']);
         $this->tester->assertTrue($data['operands'][0]['hasValue']);
         $this->tester->assertEquals(Condition::OP_IS,$data['operands'][0]['operator']);
-        $this->tester->assertEquals(true,$data['operands'][0]['value'][0]);
+        $this->tester->assertEquals(true,$data['operands'][0]['value']);
         $this->tester->assertFalse($data['operands'][0]['hasChilds']);
 
         $this->tester->assertEquals($secondOperator,$data['operands'][1]['operator']);
         $this->tester->assertEquals(2,$data['operands'][1]['operandsCount']);
         $this->tester->assertTrue($data['operands'][1]['operands'][0]['hasValue']);
         $this->tester->assertTrue($data['operands'][1]['operands'][1]['hasValue']);
-        $this->tester->assertEquals($value1,$data['operands'][1]['operands'][0]['value'][0]);
-        $this->tester->assertEquals('%my%name%',$data['operands'][1]['operands'][1]['value'][0]);
+        $this->tester->assertEquals($value1,$data['operands'][1]['operands'][0]['value']);
+        $this->tester->assertEquals('%my%name%',$data['operands'][1]['operands'][1]['value']);
         
     }
 
