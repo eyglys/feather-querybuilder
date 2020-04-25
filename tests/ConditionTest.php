@@ -166,7 +166,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
     /**
      * @depends testBasicOneColumnOperator
-     * @expectedException InvalidConditionException
+     * 
      */
     public function testWrontIsNot() {
         $column1 = $this->faker->lexify('column???');
@@ -180,7 +180,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
     /**
      * @depends testBasicOneColumnOperator
-     * @expectedException InvalidConditionException
+     * 
      */
     public function testWrongNotIn() {
         $column1 = $this->faker->lexify('column???');
