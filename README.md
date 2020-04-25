@@ -1,9 +1,8 @@
 # Feather - A Lightweight PHP QueryBuilder lib
 
-[![UnitTest](https://github.com/eyglys/feather-querybuilder/workflows/UnitTest/badge.svg)]((https://github.com/eyglys/feather-querybuilder/actions))
+[![UnitTest](https://github.com/eyglys/feather-querybuilder/workflows/UnitTest/badge.svg)](https://github.com/eyglys/feather-querybuilder/actions)
 
   
-
 ## Condition syntax
 
   

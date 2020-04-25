@@ -166,7 +166,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
     /**
      * @depends testBasicOneColumnOperator
-     * @expectedException InvalidConditionException
+     * 
      */
     public function testWrontIsNot() {
         $column1 = $this->faker->lexify('column???');
@@ -180,7 +180,7 @@ class ConditionTest extends \Codeception\Test\Unit
 
     /**
      * @depends testBasicOneColumnOperator
-     * @expectedException InvalidConditionException
+     * 
      */
     public function testWrongNotIn() {
         $column1 = $this->faker->lexify('column???');
@@ -300,7 +300,9 @@ class ConditionTest extends \Codeception\Test\Unit
         $column3 = $this->faker->lexify('column???');
         $value1 = rand(1,10);
 
-        $operators = array_filter(Condition::$logicalOperators,fn($op) => $op != Condition::OP_NOT);
+        $operators = array_filter(Condition::$logicalOperators,function($op) { 
+            return $op != Condition::OP_NOT; 
+        });
         foreach ($operators as $operator) {
             $expression = [
                 mb_strtolower($operator) => [
