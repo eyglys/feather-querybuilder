@@ -1,7 +1,6 @@
 {
     "name": "eyglys/feather-querybuilder",
     "description": "A Lightweight PHP QueryBuilder lib",
-    "version": "0.1.0",
     "type": "library",
     "license": "GPL-3.0-or-later",
     "keywords": [
