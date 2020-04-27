@@ -35,7 +35,20 @@ class QueryTest extends \Codeception\Test\Unit
     }
 
     public function testMinimalTest() {
+        $q = new Query();
+        $q->select('column1');
 
+        $this->tester->assertFalse($q->isBuildable());
+
+        $q = new Query();
+        $q->from('table');
+
+        $this->tester->assertFalse($q->isBuildable());
+
+        $q = new Query();
+        $q->select('column1')->from('table');
+
+        $this->tester->assertTrue($q->isBuildable());
         
     }
 }

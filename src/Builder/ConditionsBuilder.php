@@ -13,6 +13,8 @@ class ConditionsBuilder extends \Feather\Base {
 
     protected $paramBuilder;
     protected $driver;
+
+    protected $builderOwner;
     /**
      * Cache of operators words
      */
@@ -130,7 +132,7 @@ class ConditionsBuilder extends \Feather\Base {
     protected function resolveValue($rawValue):string {
         $value = $this->analyzeValue($rawValue);
         if ($value['type'] == Type::QUERY) {
-            return $this->createNew()->build($value['value']);
+            return $this->builderOwner->createNew()->build($value['value']);
         } elseif ($value['type'] == Type::ARRAY) {
             $values = [];            
             foreach ($value['value'] as $key => $v) {

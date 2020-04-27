@@ -29,6 +29,16 @@ class BuilderTest extends \Codeception\Test\Unit
     {
     }
 
+    public function testMinimal() {
+        $query = new Query();
+        $builder = new Builder(['driver'=>new MySQL(),'log'=>$this->log]);
+
+
+        $this->tester->expectThrowable(Feather\Exceptions\BuilderException::class,function() use ($query,$builder) {
+            $builder->build($query);
+        });
+    }
+
     
     public function testParamsCount()
     {
@@ -41,7 +51,9 @@ class BuilderTest extends \Codeception\Test\Unit
             else return 'some'.rand(1,100);
         };
 
-        $query = (new Query(['log'=>$this->log]))->where([
+        $query = (new Query(['log'=>$this->log]))->select('column1')
+        ->from('table')
+        ->where([
             'and'=>[
                 'column1[=]'=>$param('int'),
                 'column2[btw]'=>[$param('int'),$param('int')],
@@ -55,7 +67,7 @@ class BuilderTest extends \Codeception\Test\Unit
         $sql = $builder->build($query);
 
         $this->log->info('BUILDER, sql = '.$sql);
-        $params = $builder->getParams();
+        $params = $builder->paramBuilder;
 
         $this->tester->assertEquals($totalParams,$params->getCount());
 

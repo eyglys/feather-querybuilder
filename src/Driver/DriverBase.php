@@ -41,4 +41,20 @@ abstract class DriverBase extends \Feather\Base {
     public static function convertToDateTimeUTC($value){
 
     }
+
+    public static function where(string $conditions) {
+        return 'WHERE '.$conditions;
+    }
+
+    public static function from($tables) {
+        return 'FROM '.implode(', ',$tables);
+    }
+
+    public static function select($columns) {
+        return 'SELECT '.implode(', ',$columns);
+    }
+
+    public static function alias($name,$alias) {
+        return $name.' AS '.$alias;
+    }
 }

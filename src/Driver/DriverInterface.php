@@ -48,5 +48,36 @@ interface DriverInterface {
 
     public static function convertToDateTimeUTC($value);
 
+    public static function where(string $conditions);
+    /**
+     * FROM clause
+     * 
+     * @param string|array $tables table name or table list
+     * 
+     * @return string string representing FROM clause
+     */
+    public static function from(array $tables);
+
+    /**
+     * SELECT clause
+     * 
+     * @param string|array $columns column or columns
+     * @return string representation of SELECT and column(s)
+     */
+    public static function select(array $columns);
+
+    /**
+     * Syntax of a alias
+     * 
+     * SELECT column AS total
+     * 
+     * FROM table AS T
+     * 
+     * @param string $name
+     * @param string $alias
+     * @return string $name AS $alias
+     */
+    public static function alias($name,$alias);
+
     
 }

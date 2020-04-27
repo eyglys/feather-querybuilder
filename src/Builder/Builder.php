@@ -14,20 +14,16 @@ class Builder extends \Feather\Base {
 
     
 
-    protected $paramBuilder;
+    public $paramBuilder;
 
     public function __construct($params = []) {
         //test if driver is set
-        if (is_null($this->paramBuilder)) {
+        if (is_null($this->paramBuilder) && !isset($params['paramBuilder'])) {
             $this->paramBuilder = new ParamBuilder();
         }
         
 
         return parent::__construct($params);
-    }
-
-    public function getParams():ParamBuilder {
-        return $this->paramBuilder;
     }
 
     public function setDriver(DriverBase $driver) {
@@ -58,6 +54,7 @@ class Builder extends \Feather\Base {
                 return (new QueryBuilder([
                     'driver'=>$this->driver,
                     'paramBuilder'=>$this->paramBuilder,
+                    'builderOwner'=>$this
                 ]))->build($st);
             }
         } else {
