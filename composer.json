@@ -20,7 +20,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Feather\\": "src/"
+            "Feather\\": "src/",
+            "Test\\":"tests/srcBase"
         }
     },
     "require-dev": {
