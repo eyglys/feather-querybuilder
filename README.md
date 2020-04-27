@@ -83,6 +83,14 @@
 	]
 ]
 ```
+
+**Equivalent**
+```
+[
+	['column1[=]'=>$value1],
+	['column2[>]'=>$value2]
+]
+```
 **Result**
 ``WHERE (column1 = :value1) AND (column2 = :value2)``
 
