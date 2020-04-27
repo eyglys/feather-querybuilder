@@ -1,5 +1,5 @@
 <?php
-namespace Feather\Query;
+namespace Feather;
 
 class Type {
     const INT = 1;

@@ -2,7 +2,8 @@
 declare(strict_types=1);
 namespace Feather\Builder;
 
-use \Feather\Query\{Condition, Type};
+use \Feather\Query\Condition;
+use \Feather\Type;
 
 class ConditionsBuilder extends \Feather\Base {
     protected static $patternDate = '/^([0-9]{4})\-([0-9]{1,2})\-([0-9]{1,2})$/s';
