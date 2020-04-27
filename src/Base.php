@@ -7,6 +7,8 @@ namespace Feather;
  * Base class
  */
 class Base {
+
+    public $log;
     /**
      * Automatically sets properties
      */

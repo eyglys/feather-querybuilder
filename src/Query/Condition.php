@@ -121,7 +121,7 @@ class Condition extends \Feather\Base {
      * @param array $analyzeData result data of analyzeExpression
      * @return array processed data
      */
-    protected static function reanalyzeExpression(array $analyzeData) {
+    protected static function reanalyzeExpression(array $analyzeData):array {
         switch ($analyzeData['operator']) {
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
@@ -142,7 +142,7 @@ class Condition extends \Feather\Base {
      * @param string $value value of like
      * @return string transformed value
      */
-    protected static function likeTransform($operation,$value) {
+    protected static function likeTransform($operation,$value):string {
         $value = (string) $value;
         if (($operation[0] != '%') && ($operation[-1] != '%')) {
             return 
