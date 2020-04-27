@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Feather\Builder;
 
 use Feather\Exceptions\DriverException;
-use Feather\Query\{Query, Condition, Type};
+use Feather\Query\Query;
 use Feather\Statement;
 
 class Builder extends \Feather\Base {
@@ -51,19 +51,15 @@ class Builder extends \Feather\Base {
      * 
      * @throws Feather\Exceptions\DriverNotSetException when driver not set or not found
      */
-    public function build(Statement $query) {
+    public function build(Statement $st) {
         if ($this->driver instanceof \Feather\Driver\DriverInterface) {
-            
-            $conditions = $query->getWhere();
-            
-            $conditionsBuilder = new ConditionsBuilder([
-                'driver'=>$this->driver,
-                'paramBuilder'=>$this->paramBuilder,
-            ]);
 
-            $build = $conditionsBuilder->build($conditions);
-
-            return $build;
+            if ($st instanceof Query) {
+                return (new QueryBuilder([
+                    'driver'=>$this->driver,
+                    'paramBuilder'=>$this->paramBuilder,
+                ]))->build($st);
+            }
         } else {
             throw new \Feather\Exceptions\DriverNotSetException();
         }
