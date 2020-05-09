@@ -6,23 +6,38 @@ namespace Feather\Query;
  * Query class
  */
 class Query extends \Feather\Statement {
+    /**
+     * list of columns
+     *
+     * @var array
+     */
     public $select;
     
     /**
      * list of table/s
+     * @var array
      */
     public $from;
 
     /**
-     * 
-     * @var array list of Conditions
+     * list of Conditions
+     * @var array 
      */
     public $where;
 
-    public function where($condition) {
-        $this->where = Condition::analyze($condition);
-        return $this;
-    }
+    /**
+     * Limit of results
+     *
+     * @var int|null
+     */
+    public $limit = null;
+
+    /**
+     * Offset of results
+     *
+     * @var int|null
+     */
+    public $offset = null;
 
     /**
      * Select clause
@@ -39,11 +54,17 @@ class Query extends \Feather\Statement {
      * @param string|array $columns list of columns
      * @return Query
      */
-    public function select($columns) {
+    public function select($columns)
+    {
         if (!is_array($columns)) {
             $columns = [$columns];
         }
         $this->select = $columns;
+        return $this;
+    }
+
+    public function where($condition) {
+        $this->where = Condition::analyze($condition);
         return $this;
     }
 
@@ -62,6 +83,27 @@ class Query extends \Feather\Statement {
         return $this;
     }
 
+    /**
+     * Set LIMIT clause
+     *
+     * @param int|null $limit limit of results
+     * @return Query
+     */
+    public function limit(?int $limit) {
+        $this->limit = $limit;
+        return $this;
+    }
+
+    /**
+     * set OFFSET of results
+     *
+     * @param int|null $offset
+     * @return Query
+     */
+    public function offset(?int $offset) {
+        $this->offset = $offset;
+        return $this;
+    }
 
     /**
      * @return bool True if is Buildable

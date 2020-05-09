@@ -67,6 +67,15 @@ interface DriverInterface {
     public static function select(array $columns);
 
     /**
+     * Configure pagination
+     *
+     * @param int|null $limit max of records
+     * @param int|null $offset offset in record set
+     * @return string representation of LIMIT and OFFSET
+     */
+    public static function setPage(?int $limit, ?int $offset);
+
+    /**
      * Syntax of a alias
      * 
      * SELECT column AS total

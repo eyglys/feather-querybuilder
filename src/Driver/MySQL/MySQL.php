@@ -36,7 +36,25 @@ class MySQL extends DriverBase implements DriverInterface {
         ];
     }
 
-    
 
+    /**
+     * Configure pagination
+     *
+     * @param int|null $limit max of records
+     * @param int|null $offset offset in record set
+     * @return string representation of LIMIT and OFFSET
+     */
+    public static function setPage(?int $limit, ?int $offset) {
+        
+        $result = '';
+        if (!is_null($limit)) {
+            $result .= 'LIMIT '.$limit;
+        }
+        if (is_null($offset)) {
+            $result .= ' OFFSET '.$offset;
+        }
+
+        return $result;
+    }
     
 }

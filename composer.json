@@ -26,10 +26,9 @@
     },
     "require-dev": {
         "codeception/codeception": "^4.1",
-        "codeception/module-phpbrowser": "^1.0.0",
         "codeception/module-asserts": "^1.1",
-        "monolog/monolog": "^2.0",
-        "fzaninotto/faker": "^1.9"
+        "fzaninotto/faker": "^1.9",
+        "monolog/monolog": "^2.0"
     },
     "scripts": {
         "test": "codecept run unit"
