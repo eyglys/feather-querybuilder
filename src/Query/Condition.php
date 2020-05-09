@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Feather\Query;
 
 use Feather\Exceptions\InvalidConditionException;
+use Feather\Exceptions\InvalidValueException;
+
 
 class Condition extends \Feather\Base {
 
