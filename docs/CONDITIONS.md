@@ -1,5 +1,5 @@
 
-# WHERE Syntax
+# Conditions Syntax
 
 ### Relational operators
 
@@ -86,7 +86,7 @@
 ]
 ```
 **Result**
-``WHERE (column1 = :value1) AND (column2 = :value2)``
+``(column1 = :value1) AND (column2 = :value2)``
 
 **Syntax**	
 ```
@@ -98,7 +98,7 @@
 ]
 ```
 **Result**
-``WHERE (column1 != :value1) AND (column2 LIKE '%:value2%')``
+``(column1 != :value1) AND (column2 LIKE '%:value2%')``
 
 **Syntax**	
 ```
@@ -114,7 +114,7 @@
 ```
 **Result**
 ```
-WHERE (vip IS TRUE) OR (
+(vip IS TRUE) OR (
 	(column1 != :value1) AND (column2 LIKE '%:value2%')
 )
 ```
