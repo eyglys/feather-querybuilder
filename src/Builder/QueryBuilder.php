@@ -13,10 +13,10 @@ class QueryBuilder extends BaseBuilder {
         if ($query->isBuildable()) {
             $build = '';
             $build .= $this->buildSelectColumns($query->select);
-            $build .= ' '.$this->buildFrom($query->from);
-            if (!empty($query->where)) {
-                $build .= ' '.$this->buildWhere($query->where);
-            }
+            $build .= $this->buildFrom($query->from);
+            $build .= $this->buildWhere($query->where);
+
+            $build .= $this->buildPages($query->limit,$query->offset);
 
             return $build;
         } else throw new BuilderException();
@@ -29,21 +29,30 @@ class QueryBuilder extends BaseBuilder {
     }
 
     protected function buildFrom(array $tables) {
-        return $this->driver->from(
-            $this->transformAliasable($tables)
-        );
+        if (!is_null($tables)) {
+            return ' '.$this->driver->from(
+                $this->transformAliasable($tables)
+            );
+        } else return '';
+    }
+
+    protected function buildPages(?int $limit, ?int $offset) {
+        if (!is_null($limit) || !is_null($offset)) return ' '.$this->driver->setPage($limit,$offset);
+        else return '';
     }
 
     protected function buildWhere(array $conditions) {
-        $conditionsBuilder = new ConditionsBuilder([
-            'driver'=>$this->driver,
-            'paramBuilder'=>$this->paramBuilder,
-            'builderOwner'=>$this->builderOwner
-        ]);
+        if (!is_null($conditions)) {
+            $conditionsBuilder = new ConditionsBuilder([
+                'driver'=>$this->driver,
+                'paramBuilder'=>$this->paramBuilder,
+                'builderOwner'=>$this->builderOwner
+            ]);
 
-        return $this->driver->where(
-            $conditionsBuilder->build($conditions)
-        );
+            return ' '.$this->driver->where(
+                $conditionsBuilder->build($conditions)
+            );
+        }
     }
 
     protected function transformAliasable($list) {
