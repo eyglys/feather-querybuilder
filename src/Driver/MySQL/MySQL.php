@@ -50,7 +50,7 @@ class MySQL extends DriverBase implements DriverInterface {
         if (!is_null($limit)) {
             $result .= 'LIMIT '.$limit;
         }
-        if (is_null($offset)) {
+        if (!is_null($offset)) {
             $result .= ' OFFSET '.$offset;
         }
 
