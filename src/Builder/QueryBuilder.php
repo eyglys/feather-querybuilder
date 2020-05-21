@@ -16,7 +16,10 @@ class QueryBuilder extends BaseBuilder {
             $build .= $this->buildFrom($query->from);
             $build .= $this->buildWhere($query->where);
 
+            $build .= $this->buildOrderBy($query->orderBy);
+            
             $build .= $this->buildPages($query->limit,$query->offset);
+
 
             return $build;
         } else throw new BuilderException();
@@ -52,7 +55,13 @@ class QueryBuilder extends BaseBuilder {
             return ' '.$this->driver->where(
                 $conditionsBuilder->build($conditions)
             );
-        }
+        } else return '';
+    }
+
+    protected function buildOrderBy(?array $columns) {
+        if (!is_null($columns)) {
+            return ' '.$this->driver->orderBy($columns);
+        } else return '';
     }
 
     protected function transformAliasable($list) {

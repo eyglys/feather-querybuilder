@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace Feather\Query;
 
+use Feather\Exceptions\InvalidValueException;
+
 /**
  * Query class
  */
@@ -40,6 +42,23 @@ class Query extends \Feather\Statement {
     public $offset = null;
 
     /**
+     * Order of results
+     *
+     * @var array|null
+     */
+    public $orderBy = null;
+
+    /**
+     * Constant of order ASC
+     */
+    const ORDER_ASC = 'ASC';
+
+    /**
+     * Constant of oder DESC
+     */
+    const ORDER_DESC = 'DESC';
+
+    /**
      * Select clause
      * 
      * select('name') -> SELECT name
@@ -71,7 +90,7 @@ class Query extends \Feather\Statement {
     /**
      * FROM clause
      * 
-     * @param array $tables
+     * @param string|array $tables
      * 
      * @return Query
      */
@@ -106,11 +125,58 @@ class Query extends \Feather\Statement {
     }
 
     /**
+     * set ORDER BY clause
+     *
+     * @param string|array $columns
+     * @return Query
+     * 
+     * @throws Feather\Exceptions\InvalidValueException when order value is invalid
+     */
+    public function orderBy($columns) {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+        $this->orderBy = $this->validateAndTransformOrderBy($columns);
+        return $this;
+    }
+
+    /**
      * @return bool True if is Buildable
      */
     public function isBuildable() {
         return !empty($this->select) && !empty($this->from);
     }
 
+    /**
+     * Validate if order is in format:
+     * 
+     * [
+     *  'column1'=>Query::ORDER_DESC,
+     *  'column2'=>Query::ORDER_ASC,
+     *  'column3'
+     * ]
+     *
+     * @param array $columns order columns
+     * @return array 
+     * [
+     *  'column1'=>Query::ORDER_DESC,
+     *  'column2'=>Query::ORDER_ASC,
+     *  'column3'=>null
+     * ]
+     * 
+     * @throws Feather\Exceptions\InvalidValueException when order value is invalid
+     */
+    protected function validateAndTransformOrderBy($columns) {
+        foreach ($columns as $key=>$value) {
+            if (!is_string($key)) {
+                $columns[$value] = null;
+                unset($columns[$key]);
+            } elseif (($value != self::ORDER_ASC) && ($value != self::ORDER_DESC)) {
+                throw new InvalidValueException($value);
+            }
+        }
+
+        return $columns;
+    }
     
 }

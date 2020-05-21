@@ -54,7 +54,22 @@ abstract class DriverBase extends \Feather\Base {
         return 'SELECT '.implode(', ',$columns);
     }
 
+    public static function orderBy(array $columns) {
+        return 'ORDER BY '.
+            implode(", ",
+                array_map(
+                    function($key,$value) {
+                        return $key.' '.$value;
+                    },
+                    array_keys($columns),
+                    array_values($columns)
+                )
+            );
+    }
+
     public static function alias($name,$alias) {
         return $name.' AS '.$alias;
     }
+
+    
 }

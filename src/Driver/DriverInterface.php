@@ -76,6 +76,19 @@ interface DriverInterface {
     public static function setPage(?int $limit, ?int $offset);
 
     /**
+     * Configure order of result set
+     *
+     * @param array $columns in format:
+     * [
+     *  'column1'=>Query::ORDER_DESC,
+     *  'column2'=>Query::ORDER_ASC,
+     *  'column3'=>null
+     * ]
+     * @return string representation of order by
+     */
+    public static function orderBy(array $columns);
+
+    /**
      * Syntax of a alias
      * 
      * SELECT column AS total
