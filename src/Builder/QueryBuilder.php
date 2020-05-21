@@ -41,7 +41,7 @@ class QueryBuilder extends BaseBuilder {
         else return '';
     }
 
-    protected function buildWhere(array $conditions) {
+    protected function buildWhere(?array $conditions) {
         if (!is_null($conditions)) {
             $conditionsBuilder = new ConditionsBuilder([
                 'driver'=>$this->driver,
