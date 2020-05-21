@@ -45,14 +45,23 @@ class MySQL extends DriverBase implements DriverInterface {
      * @return string representation of LIMIT and OFFSET
      */
     public static function setPage(?int $limit, ?int $offset) {
+        #OFFSET without LIMIT
+        #From MySQL docs: https://dev.mysql.com/doc/refman/8.0/en/select.html#sa21818891
         
         $result = '';
+        if (!is_null($offset)) {
+            if (is_null($limit)) {
+                $limit = PHP_INT_MAX;
+            }
+        }
+        
         if (!is_null($limit)) {
             $result .= 'LIMIT '.$limit;
+            if (!is_null($offset)) {
+                $result .=' OFFSET '.$offset;
+            }
         }
-        if (!is_null($offset)) {
-            $result .= ' OFFSET '.$offset;
-        }
+        
 
         return $result;
     }
